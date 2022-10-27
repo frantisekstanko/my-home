@@ -1,0 +1,15 @@
+.bash_history
+.cache/
+.config/dconf/user
+.local/bin
+.local/lib
+.local/share
+.local/state
+.mozilla
+.npm
+.oh-my-zsh
+.serverauth*
+.vim
+.zcompdump*
+.zsh_history
+.Xauthority

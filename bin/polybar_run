@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+polybar-msg cmd quit || true
+
+DPI=130 polybar &
+

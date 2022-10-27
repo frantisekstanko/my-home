@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+while true; do
+    available=$(awk '/MemAvailable/ { printf "%d", $2/1024; } ' /proc/meminfo)
+
+    availableGB_int=$(("${available}"/1024))
+
+    if [[ "${availableGB_int}" -ge 10 ]]; then
+        echo " ${availableGB_int}GB"
+    elif [[ "${available}" -le 999 ]]; then
+        echo "%{F#ff6666} ${available}MB%{F-}"
+    else
+        availableGB_float=$(bc <<< "scale = 1; (""${available}"" / 1024)")
+        if [[ "${available}" -le 2000 ]]; then
+            echo "%{F#eee} ${availableGB_float}GB%{F-}"
+        else
+            echo " ${availableGB_float}GB"
+        fi
+    fi
+
+    sleep 1
+done
+

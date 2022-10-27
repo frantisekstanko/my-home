@@ -1,0 +1,84 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+log_file=~/.stats/cpu.log
+
+cores=$(nproc)
+
+temperature_file=''
+
+for file in /sys/class/thermal/thermal_zone*; do
+    if [[ ! -e "${file}" ]]; then
+        continue
+    fi
+    this_type=$(cat "${file}"/type) 
+    if [[ "${this_type}" == "x86_pkg_temp" ]]; then
+        temperature_file="${file}"/temp
+        break
+    fi
+done
+
+if [[ -z "${temperature_file}" ]]; then
+    exit 1
+fi
+
+while true; do
+    load=$(awk '{ print $1 }' < /proc/loadavg)
+    float=$(echo "scale=2 ; ${load} / ${cores} * 100" | bc)
+    perc=$(printf "%.f" "${float}")
+
+    temp=$(cat "${temperature_file}")
+
+    temp=$(echo "${temp} / 1000" | bc)
+    cel=$'\xc2\xb0'
+
+    date_now=$(date +%s)
+
+    echo -e "${date_now}\t${perc}\t${temp}" >> "${log_file}"
+
+    if [[ "${perc}" -gt 99 ]]; then
+        showperc=99
+    elif [[ "${perc}" -lt 10 ]]; then
+        showperc=" ${perc}"
+    else
+        showperc=${perc}
+    fi
+
+    if [[ "${perc}" -ge 50 ]]; then
+        showperc="%{F#ff6666}${showperc}%%{F-}"
+        severity=2
+    elif [[ "${perc}" -ge 25 ]]; then
+        showperc="%{F#eee}${showperc}%%{F-}"
+        severity=1
+    else
+        showperc="${showperc}%"
+        severity=0
+    fi
+
+    if [[ "${temp}" -ge 70 ]]; then
+        showtemp="%{F#ff6666}${temp}${cel}%{F-}"
+        severity=2
+    elif [[ "${temp}" -ge 60 ]]; then
+        showtemp="%{F#eee}${temp}${cel}%{F-}"
+        if [[ "${severity}" -lt 1 ]]; then
+            severity=1
+        fi
+    else
+        showtemp="${temp}${cel}"
+    fi
+
+    if [[ "${severity}" -ge 2 ]]; then
+        icon="%{F#ff6666}%{F-}"
+    elif [[ "${severity}" -ge 1 ]]; then
+        icon="%{F#eee}%{F-}"
+    else
+        icon=""
+    fi
+
+    echo "${icon} ${showperc} ${showtemp}"
+
+    sleep 1
+done
+

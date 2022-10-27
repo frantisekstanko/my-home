@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -eo pipefail
+IFS=$'\n\t'
+
+mkdir -p /tmp/redshift
+
+save_file=/tmp/redshift/value
+
+if [[ ! -f "${save_file}" ]]; then
+    now=4000
+else
+    now=$(cat /tmp/redshift/value)
+fi
+
+case "${1}" in
+    'yellow') now=$((now-100));;
+    'blue')   now=$((now+100));;
+    *) exit;
+esac
+
+if [[ "${now}" -le 1000 ]] || [[ "${now}" -ge 6000 ]]; then
+    exit
+fi
+
+redshift -P -O "${now}" > /dev/null
+
+echo "${now}" > /tmp/redshift/value
+

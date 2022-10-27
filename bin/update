@@ -1,0 +1,380 @@
+#!/bin/bash
+
+## This script performs either an initial install of a workstation,
+## or updates everything on a workstation to its latest version.
+
+## strict bash mode
+set -euo pipefail
+IFS=$'\n\t'
+
+## this script needs to be executed as a normal user whose
+## home directory we are going to be working on
+if [[ "${EUID}" -eq 0 ]]; then
+  echo 'Please, do NOT run me as root.'
+  exit 1
+fi
+
+## these are the variables we are able to set before we determine
+## the hostname/profile of this workstation
+UPDATER=$(realpath "$0")
+UPDATER_DIR=$(dirname "${UPDATER}")
+UPDATER_CACHE_DIR="${HOME}/.cache/updater"
+UPDATER_PROFILES_DIR="${HOME}/.config/updater/profiles"
+WHOAMI=$(whoami)
+if command -v nvim > /dev/null; then
+  EDITOR='nvim'
+elif command -v vim > /dev/null; then
+  EDITOR='vim'
+else
+  EDITOR='vi'
+fi
+
+## let the user edit this script before anything else continues
+for var in "$@"; do
+  if [[ "${var}" == "--edit" ]]; then
+      ${EDITOR} "${UPDATER}"
+      exit
+  fi
+  if [[ "${var}" == "--fn" ]]; then
+    ${EDITOR} "${UPDATER_DIR}/functions.sh"
+    exit
+  fi
+done
+
+# shellcheck disable=SC1091
+source "${UPDATER_DIR}/functions.sh"
+
+## the following will ensure that the current hostname has a valid profile
+## hostnames serve as unique identifiers of specific workstations
+##
+## after this function successfully exits, we obtain two new variables
+## defined in the current runtime:
+## - ${HOSTNAME}
+## - ${INSTALLER_PROFILE_PATH}
+create_or_load_profile "${UPDATER_PROFILES_DIR}"
+
+## continue setting variables with the $HOSTNAME we obtained a moment ago
+UPDATER_LOG_DIR="${UPDATER_PROFILES_DIR}/${HOSTNAME}/log"
+
+## the following are 3 simple save files which contain the unixtime of when
+## this script finished certain actions on this workstation for the first time
+## 
+## this will help us know during future executions of this script
+## how much work we need to do
+UPDATER_COMPLETED_AT_LEAST_ONCE_SAVE_FILE="${UPDATER_LOG_DIR}/second_stage_done"
+REPOS_INSTALLED_SAVE_FILE="${UPDATER_LOG_DIR}/repos_installed"
+SYSTEM_CLONED_SAVE_FILE="${UPDATER_LOG_DIR}/system_cloned"
+
+## obtain default values for variables that are undefined,
+## i.e. missing in the env file for this workstation
+## (or the env file is completely empty)
+##
+## see the definition of this function to find out what
+## variables you can set in your env file
+set_default_values
+
+if [[ -f "${UPDATER_COMPLETED_AT_LEAST_ONCE_SAVE_FILE}" ]]; then
+  INSTALLATION_MODE='quick'
+else
+  INSTALLATION_MODE='full'
+fi
+
+if [[ ! -f ${REPOS_INSTALLED_SAVE_FILE} ]]; then
+  RECONFIGURE_ZYPPER_REPOSITORIES=true 
+else
+  RECONFIGURE_ZYPPER_REPOSITORIES=false
+fi
+
+## at this point, we need to be sure all required directories exist
+mkdir -p "${UPDATER_CACHE_DIR}" \
+         "${UPDATER_LOG_DIR}" \
+         ~/.local/bin
+
+## let the user force-change some of the values automatically detected above,
+## or perform a different action than continuing this script
+for var in "$@"; do
+  if [[ "${var}" == "--full" ]]; then
+    INSTALLATION_MODE='full'
+  elif [[ "${var}" == "--reinstall-repos" ]]; then
+    RECONFIGURE_ZYPPER_REPOSITORIES=true 
+  elif [[ "${var}" == "--env" ]]; then
+    ${EDITOR} "${INSTALLER_PROFILE_PATH}"
+    exit
+  elif [[ "${var}" == "--clone" ]]; then
+    clone_system "${UPDATER_LOG_DIR}"
+    exit
+  fi
+done
+
+## the user has not request any different action, so we are starting the flow
+echo_current_step 'Welcome in updater!'
+
+## start with actions that are required in full install only
+##
+## any of the following is not expected to change or require reinstall;
+## and if it does, just run update --full safely again
+if [[ "${INSTALLATION_MODE}" == 'full' ]]; then
+  if [[ ! -f "${SYSTEM_CLONED_SAVE_FILE}" ]]; then
+    clone_system "${UPDATER_LOG_DIR}"
+    date "+%s" > "${SYSTEM_CLONED_SAVE_FILE}"
+  fi
+
+  ## be careful with this
+  ##
+  ## this is disabled by default
+  if [[ "${STOP_ASKING_FOR_SUDO_PASSWORD}" == true ]]; then
+    echo_current_step 'Stop asking for sudo password'
+    stop_asking_for_sudo_password
+  fi
+
+  ## set zypper to keep more past kernels; just to be on the safe side
+  ##
+  ## we want to do this before our first 'zypper dup', which is coming up soon
+  multiversionConfig='multiversion.kernels = running,latest,latest-1'
+  multiversionConfig+='latest-2,latest-3,latest-4'
+  if ! grep -qE "^${multiversionConfig}" /etc/zypp/zypp.conf; then
+    sudo sed -i '/^multiversion.kernels/d' /etc/zypp/zypp.conf
+    { echo ''; echo "${multiversionConfig}"; } \
+      | sudo tee -a /etc/zypp/zypp.conf > /dev/null
+  fi
+fi
+
+## this action must be carried AFTER cloning the system
+##
+## be careful when moving this around
+if [[ "${RECONFIGURE_ZYPPER_REPOSITORIES}" == true ]]; then
+  reconfigure_zypper_repositories
+  date '+%s' > "${REPOS_INSTALLED_SAVE_FILE}"
+fi
+
+echo_current_step 'Refresh all repositories'
+sudo zypper --gpg-auto-import-keys refresh
+
+# we can install our first packages at this point!
+if ! command -v tmux > /dev/null; then
+  sudo zypper install --no-confirm tmux brightnessctl htop vim ncdu wget mc
+  # shellcheck disable=SC2310
+  if confirm_action 'Stop the updater now to re-run in tmux?'; then
+    echo 'OK, execute "tmux" and then execute "update" again'
+    exit
+  fi
+fi
+
+# at this point we should make sure we're on the latest snapshot
+echo_current_step 'Update the system'
+if ! sudo zypper dup --no-confirm; then
+  echo 'Execute "sudo zypper dup" to try and resolve the problems'
+fi
+
+# kindly ask the user to reboot, if they are willing to
+offer_reboot_if_required
+
+if [[ "${INSTALLATION_MODE}" == 'full' ]]; then
+  sudo timedatectl set-timezone "${TIMEZONE}"
+  sudo timedatectl set-ntp true
+
+  # shellcheck disable=SC2178
+  install=$(set -e; get_preset_packages_list)
+
+  echo_current_step 'Install packages'
+  echo "${install[*]}" | xargs sudo zypper install \
+    --no-confirm \
+    --auto-agree-with-licenses
+
+  if [[ ! -d ~/.oh-my-zsh ]]; then
+    echo_current_step 'Install oh-my-zsh'
+    git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
+  fi
+
+  echo_current_step 'Initialize /tmp/ in tmpfs'
+  if ! grep -q '^tmpfs /tmp/' /etc/fstab; then
+    {
+      echo ''
+      echo "tmpfs /tmp/ tmpfs defaults,noatime,size=${TMP_SIZE},mode=1777 0 0"
+    } | sudo tee -a /etc/fstab > /dev/null 2>&1
+  fi
+
+  if [[ "${VAR_LOG_IN_TMPFS}" == true ]]; then
+    echo_current_step 'Initialize /var/log/ in tmpfs'
+    if ! grep -q '^tmpfs /var/log/' /etc/fstab; then
+      {
+        echo ''
+        echo 'tmpfs /var/log/ tmpfs defaults,noatime,size=512M,mode=0755 0 0'
+      } | sudo tee -a /etc/fstab > /dev/null 2>&1
+    fi
+    echo_current_step 'Fix auditd in tmpfs'
+    sudo mkdir -p /etc/systemd/system/auditd.service.d/
+    {
+      echo '[Service]'
+      echo 'ExecStartPre=mkdir -p /var/log/audit/'
+    } | sudo tee /etc/systemd/system/auditd.service.d/log_fix.conf > /dev/null
+  else
+    sudo rm -f /etc/systemd/system/auditd.service.d/log_fix.conf
+  fi
+
+  echo_current_step 'Ignore power key'
+  if ! grep -q '^HandlePowerKey' /etc/systemd/logind.conf; then
+    {
+      echo
+      echo 'HandlePowerKey=ignore'
+    } | sudo tee -a /etc/systemd/logind.conf > /dev/null
+  fi
+
+  # handle systemd services
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now firewalld.service
+
+  if command -v bluetoothctl > /dev/null; then
+    # we don't need bluetooth enabled at all times
+    sudo systemctl disable bluetooth.service
+  fi
+
+  if command -v tlp-stat > /dev/null; then
+    sudo systemctl enable --now tlp
+  fi
+
+  if [[ "${NVIDIA_OPTIMUS}" = true ]]; then
+    echo_current_step 'Prepare X for nvidia'
+    sudo chmod 777 /usr/bin/X
+    sudo prime-select boot nvidia > /dev/null
+
+    # Hints: to check if everything is OK:
+    # sudo prime-select service check
+    # sudo prime-select get-current
+    # xrandr --listproviders
+  fi
+
+  # we need to be sure we're home right now ...
+  cd ~
+
+  # ... and to have our HEAD clean ...
+  echo_current_step 'Assume some very stubborn dotfiles unchanged'
+  stubborn_git_files=$(set -e; get_stubborn_git_files)
+  for file in "${stubborn_git_files[@]}"; do
+    if [[ -f "${file}" ]]; then
+      git update-index --assume-unchanged "${file}"
+    fi
+  done
+
+  # make zsh the default shell
+  zshfile=$(command -v zsh)
+  if [[ -n "${zshfile}" ]]; then
+    sudo usermod -s "${zshfile}" "${WHOAMI}" > /dev/null
+  fi
+
+  # let us make sure all important files and directories correct chmod
+  if [[ -d ~/.ssh ]]; then
+    chmod 700 ~/.ssh
+    chmod 600 ~/.ssh/* || true
+    chmod 644 ~/.ssh/*.pub || true
+  fi
+
+  if [[ -d ~/.gnupg ]]; then
+    chmod 700 ~/.gnupg
+    chmod 600 ~/.gnupg/* || true
+    chmod 700 ~/.gnupg/openpgp-revocs.d/ || true
+    chmod 700 ~/.gnupg/private-keys-v1.d/ || true
+  fi
+
+  if [[ ! -d ~/.local/share/fonts/JetBrains/ ]]; then
+    echo_current_step 'Download and install JetBrains fonts (source: github)'
+    install_jetbrains_fonts "${UPDATER_CACHE_DIR}"
+    echo_current_step 'Refreshing font cache'
+    fc-cache -f 
+  fi
+
+  if [[ "${PHP_STORM}" == true ]]; then
+    if [[ ! -d ~/data/software/PhpStorm/ ]]; then
+      install_phpstorm "${UPDATER_CACHE_DIR}"
+    fi
+  fi
+
+  if [[ "${SPOTIFY}" == true ]]; then
+    install_spotify
+  fi
+
+  if [[ "${DOCKER}" == true ]]; then
+    # enable docker buildkit
+    {
+      echo '{'
+      echo '  "log-level": "warn",'
+      echo '  "log-driver": "json-file",'
+      echo '  "log-opts": {'
+      echo '  "max-size": "10m",'
+      echo '  "max-file": "5"'
+      echo '  },'
+      echo '  "features": { "buildkit": true }'
+      echo '}'
+    } | sudo tee /etc/docker/daemon.json > /dev/null 2>&1
+    sudo usermod -aG docker "${WHOAMI}"
+  fi
+
+  if [[ "${INSTALL_VIRTUALBOX}" == true ]]; then
+    sudo usermod -aG vboxusers "${WHOAMI}"
+  fi
+
+  # /etc/nsswitch.conf is currently missing in opensuse for some reason,
+  # so we will copy the default
+  if [[ ! -f /etc/nsswitch.conf ]]; then
+    sudo cp /usr/etc/nsswitch.conf /etc/nsswitch.conf
+  fi
+fi
+
+## all the following things are always executed -- in full and lite mode
+## anything below this line is expected to require constant checks for updates
+
+## i3ipc and fontawesome are required for dealing with polybar
+echo_current_step 'Install/upgrade pip3 packages'
+pip3 --quiet install --upgrade tldr i3ipc fontawesome
+
+## TODO make this configurable
+install_lazygit "${UPDATER_CACHE_DIR}"
+install_phpstan "${UPDATER_CACHE_DIR}"
+install_php_cs_fixer "${UPDATER_CACHE_DIR}"
+
+if [[ "${INSTALL_SASS}" == true ]]; then
+  install_dart_sass "${UPDATER_CACHE_DIR}"
+else
+  rm -f "/home/${WHOAMI}/.local/bin/sass"
+fi
+
+if [[ "${DOCKER}" == true ]]; then
+  install_docker_compose "${UPDATER_CACHE_DIR}"
+  install_lazydocker "${UPDATER_CACHE_DIR}"
+fi
+
+if [[ "${LIBRESPOT}" == true ]]; then
+  echo_current_step 'Compiling librespot'
+  install_librespot "${INSTALLATION_MODE}"
+fi
+
+show_startx_hint=false
+if [[ ! -f "${UPDATER_COMPLETED_AT_LEAST_ONCE_SAVE_FILE}" ]]; then
+  show_startx_hint=true
+  datetime=$(date '+%Y-%m-%d_%H:%M:%S')
+  list_installed_packages > "${UPDATER_LOG_DIR}/${datetime}-clean.second.stage.log" 
+  date '+%s' > "${UPDATER_COMPLETED_AT_LEAST_ONCE_SAVE_FILE}"
+fi
+
+echo_current_step 'All done'
+
+if [[ "${show_startx_hint}" == true ]]; then
+  echo
+  echo 'You can start the desktop environment by typing "startx"'
+  echo
+fi
+
+if [[ ! -d /home/.ecryptfs/"${WHOAMI}"/ ]]; then
+  echo
+  echo 'Your home folder is unencrypted.'
+  echo 'It is recommended to encrypt your home folder.'
+  echo 'Here is the guide:'
+  echo ' - reboot the OS (so you have never logged in during this boot)'
+  echo ' - login as root only (main user cannot be logged in)'
+  echo " - execute: ecryptfs-migrate-home -u ${WHOAMI}"
+  echo ' - follow the wizard'
+  echo
+fi
+
+offer_reboot_if_required
+

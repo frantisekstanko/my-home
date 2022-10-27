@@ -1,0 +1,78 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+while true; do 
+    minute=$(date "+%M")
+
+    minute=${minute#0}
+
+    if [[ "${minute}" -ge 58 ]]; then
+        progress='█████████████████████████████';
+    elif [[ "${minute}" -ge 56 ]]; then
+        progress='████████████████████████████░';
+    elif [[ "${minute}" -ge 54 ]]; then
+        progress='███████████████████████████░░';
+    elif [[ "${minute}" -ge 52 ]]; then
+        progress='██████████████████████████░░░';
+    elif [[ "${minute}" -ge 50 ]]; then
+        progress='█████████████████████████░░░░';
+    elif [[ "${minute}" -ge 48 ]]; then
+        progress='████████████████████████░░░░░';
+    elif [[ "${minute}" -ge 46 ]]; then
+        progress='███████████████████████░░░░░░';
+    elif [[ "${minute}" -ge 44 ]]; then
+        progress='██████████████████████░░░░░░░';
+    elif [[ "${minute}" -ge 42 ]]; then
+        progress='█████████████████████░░░░░░░░';
+    elif [[ "${minute}" -ge 40 ]]; then
+        progress='████████████████████░░░░░░░░░';
+    elif [[ "${minute}" -ge 38 ]]; then
+        progress='███████████████████░░░░░░░░░░';
+    elif [[ "${minute}" -ge 36 ]]; then
+        progress='██████████████████░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 34 ]]; then
+        progress='█████████████████░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 32 ]]; then
+        progress='████████████████░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 30 ]]; then
+        progress='███████████████░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 28 ]]; then
+        progress='██████████████░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 26 ]]; then
+        progress='█████████████░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 24 ]]; then
+        progress='████████████░░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 22 ]]; then
+        progress='███████████░░░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 20 ]]; then
+        progress='██████████░░░░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 18 ]]; then
+        progress='█████████░░░░░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 16 ]]; then
+        progress='████████░░░░░░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 14 ]]; then
+        progress='███████░░░░░░░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 12 ]]; then
+        progress='██████░░░░░░░░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 10 ]]; then
+        progress='█████░░░░░░░░░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 8 ]]; then
+        progress='████░░░░░░░░░░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 6 ]]; then
+        progress='███░░░░░░░░░░░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 4 ]]; then
+        progress='██░░░░░░░░░░░░░░░░░░░░░░░░░░░';
+    elif [[ "${minute}" -ge 2 ]]; then
+        progress='█░░░░░░░░░░░░░░░░░░░░░░░░░░░░';
+    else
+        progress='░░░░░░░░░░░░░░░░░░░░░░░░░░░░░';
+    fi
+    time_now=$(date +"%{F#aaffffff}%H:%M%{F-}:%S")
+    date_now=$(date +"%d.%m.%Y %a")
+    echo "${time_now}  %{T4}${progress}%{T-}  ${date_now}"
+
+    sleep 0.5
+done
+

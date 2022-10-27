@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [[ "$1" == '--simple' ]]; then
+    tr -dc 'aABcCDeEfFgGhHJkKLmMnNpPqQrRsStTuUvVxXyYzZ1234567890' </dev/random | head -c 64 || true; echo
+else
+    tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_{|}~' </dev/random | head -c 64 || true; echo
+fi

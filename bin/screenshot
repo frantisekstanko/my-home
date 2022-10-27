@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+date=$(date +%s)
+mkdir -p ~/screenshots/
+/usr/bin/xfce4-screenshooter -f -s ~/screenshots/"${date}.png"

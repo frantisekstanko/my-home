@@ -1,0 +1,5 @@
+# there is no need to track the following files
+*/log/system_cloned
+*/log/repos_installed
+*/log/second_stage_done
+

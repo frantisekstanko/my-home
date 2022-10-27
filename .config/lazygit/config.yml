@@ -1,0 +1,22 @@
+gui:
+  theme:
+    activeBorderColor:
+      - '#cccccc'
+      - bold
+    inactiveBorderColor:
+      - '#666'
+
+promptToReturnFromSubprocess: false
+
+git:
+  paging:
+    colorArg: always
+    pager: diff-so-fancy
+
+os:
+  editCommand: 'nvim'
+
+keybinding:
+  universal:
+    appendNewline: '<tab>'
+

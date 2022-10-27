@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+layout=$(setxkbmap -query | grep 'layout' | awk '{print $2}')
+
+if [[ ${layout} == "us" ]]; then
+    setxkbmap "nl"
+else
+    setxkbmap "us"
+fi
