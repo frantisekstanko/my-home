@@ -57,3 +57,84 @@ rollback to last week’s snapshot, fast-forward again,
 and even preview upcoming releases.
 
 It's also secure.
+
+### How to install and use
+
+#### Install the base system
+Currently, the very first installation must be carried
+by an automatic installer, but every other reinstall
+of the same machine is automatic!
+
+So for your first install, you can just download
+the official ISO file from openSUSE and
+[follow the official instructions](https://get.opensuse.org/tumbleweed/).
+
+During the installation process, choose to install the "server"
+version, which is the smallest base preset you can install.
+
+#### Getting your home
+As this is your initial install, clone this repository
+into your home directory.
+
+It is expected that this is a clean install and that **conflicting
+files will be overwritten with the repository files**.
+
+You can do it like this:
+
+```
+cd ~
+git init .
+git remote add origin https://github.com/frantisekstanko/my-home
+git fetch origin
+git checkout -f origin/main
+git checkout main
+git merge origin/main
+```
+
+Now all the configuration is downloaded and tracked in your home
+folder. You can easily edit and commit back to your local branch.
+You can push to your backup server. You can reinstall from your
+backup server and reset to your last checkpoint easily!
+
+#### Install everything on top of the base system
+
+Along with the configuration, a very important bash script
+was merged into your home and that is
+[~/bin/update](https://github.com/frantisekstanko/my-home/blob/main/bin/update).
+
+This script performs either an initial install on everything
+custom on top of the base system, or updates it at
+any point in time.
+
+You can just run it from your command line like this:
+
+```
+$ update
+```
+
+And follow the instructions on-screen.
+
+The beautiful thing about this `update` script, which I consider
+a ***core*** of this whole project, is that it is designed
+to be executed over and over again safely. This ensures 3 things:
+
+- the same procedure can be executed from any starting point of the system
+
+- if the script fails, there is no need to "rollback" to anywhere;
+simply see what has gone wrong, fix the problem somehow,
+and execute the script again, without even needing to reboot
+
+- as this script is already tracked with `git`,  you can commit
+any fixes or changes and in a future reinstall, already start
+with those (or open a pull request and share with us!)
+
+How cool is that?
+
+### So what now
+
+After the install, your desktop environment is ready with:
+
+- [i3gaps](https://github.com/Airblader/i3) - a tiling window manager, which can be set to stacking
+with just one config parameter
+- [polybar](https://github.com/polybar/polybar) - a fast and easy-to-use tool for creating status bars
+- [kitty](https://github.com/kovidgoyal/kitty) - the fast, feature-rich, cross-platform, GPU based terminal
