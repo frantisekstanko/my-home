@@ -175,3 +175,38 @@ Look at `~/bin/update` and see how the system was installed.
 Change whatever you don't like, or add anything you need.
 Edit any of the configuration files. Open pull requests.
 Open issues. Tell me what you think!
+
+## Cool default configuration
+
+Thanks to an amazing work by [Justin Buchanan](https://github.com/justbuchanan/i3scripts),
+we have a beautiful and ingenious task manager for i3. On this example, you can see
+3 workspaces with various apps running. The second workspace holds 3 instances of Firefox.
+
+![1666892801](https://user-images.githubusercontent.com/100702441/198362002-adc83818-5529-48ed-8b6f-76abdc841f30.png)
+
+The bar is [easily configurable](https://github.com/polybar/polybar/wiki).
+
+Here's a git status, cpu status, available RAM, volume, amount of CO2 in my room, battery and backlight:
+
+![1666892380](https://user-images.githubusercontent.com/100702441/198362004-682f014b-cb5b-41fb-8f2a-3df01aeee1ec.png)
+
+White values are warnings. Red values are danger. The ranges can be configured.
+
+### Things that work out of the box:
+
+Nvidia drivers work perfectly if you're on Optimus (enterprise notebooks,
+mostly Dell).
+
+i3 keyboard shortcuts are preconfigured and all can be changed
+easily. By default:
+
+- `ALT+Enter` opens a terminal
+- `ALT+D` opens a "start menu" to look for whatever
+- `ALT+P` saves a screenshot to `~/screenshots/`
+- `ALT+O` locks the screen
+- `ALT+Tab` switches between windows
+- `ALT+Shift+Q` closes a window
+- Media/volume and brightness keys also work by default
+- `ALT+[` and `ALT+]` increase and decrease the notebook
+screen brightness, so if you're using an external keyboard,
+you don't need to reach your notebook
