@@ -146,6 +146,7 @@ with just one config parameter
 All your favorite software can be installed easily, for example:
 
 - Steam
+- Spotify
 - Google Chrome
 - VirtualBox
 - even PHPStorm
