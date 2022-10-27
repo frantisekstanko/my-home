@@ -116,7 +116,7 @@ And follow the instructions on-screen.
 
 The beautiful thing about this `update` script, which I consider
 a ***core*** of this whole project, is that it is designed
-to be executed over and over again safely. This ensures 3 things:
+to be executed over and over again safely. This ensures 4 things:
 
 - the same procedure can be executed from any starting point of the system
 
@@ -127,6 +127,10 @@ and execute the script again, without even needing to reboot
 - as this script is already tracked with `git`,  you can commit
 any fixes or changes and in a future reinstall, already start
 with those (or open a pull request and share with us!)
+
+- when you are on a deployed system and decide to add/install
+something, you do it once and for all; simply by adding it to the
+script itself
 
 How cool is that?
 
