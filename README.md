@@ -142,3 +142,35 @@ After the install, your desktop environment is ready with:
 with just one config parameter
 - [polybar](https://github.com/polybar/polybar) - a fast and easy-to-use tool for creating status bars
 - [kitty](https://github.com/kovidgoyal/kitty) - the fast, feature-rich, cross-platform, GPU based terminal
+
+All your favorite software can be installed easily, for example:
+
+- Steam
+- Google Chrome
+- VirtualBox
+- even PHPStorm
+- and Nvidia drivers, thanks to openSUSE
+
+### How to track changes and edit everything to your liking
+
+In `~/.config/updater/profiles/`, a profile for this install
+was created. The profile contains 2 important files:
+
+- `.env` - the main configuration of this profile.
+You can edit this file whenever you want by executing
+`update --env`. you can change this configuration,
+save it, then run `update` again and the new configuration
+will be applied
+- `DATETIME-clean.install.xml` - this file
+can be later used for unattended reinstall of this
+workstation
+
+Both files can, and should be, commited to your local repository,
+for backup purposes, for example.
+
+#### If you don't like anything
+
+Look at `~/bin/update` and see how the system was installed.
+Change whatever you don't like, or add anything you need.
+Edit any of the configuration files. Open pull requests.
+Open issues. Tell me what you think!
