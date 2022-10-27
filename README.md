@@ -35,10 +35,12 @@ Currently, this whole project is based on
 but this idea could be turned into a multi-distribution
 project very easily.
 [Arch Linux](https://archlinux.org/) would be essential,
-but I would need a maintainer for that. I could add
+but I would currently need a maintainer for that. I could add
 [Debian](https://www.debian.org/) support quite easily,
 meaning this could be used for creating easily-reproducible
 devices like kiosks, as it would run pretty smoothly on Raspberry Pis too!
+In fact, I am already using it on all my Raspberry Pis,
+I just need to merge those into this project.
 
 However, **advantages** of openSUSE Tumbleweed:
 
