@@ -164,6 +164,7 @@ fi
 echo_current_step 'Update the system'
 if ! sudo zypper dup --no-confirm; then
   echo 'Execute "sudo zypper dup" to try and resolve the problems'
+  exit 1
 fi
 
 # kindly ask the user to reboot, if they are willing to
