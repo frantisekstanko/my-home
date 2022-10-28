@@ -288,6 +288,7 @@ function get_base_packages_list(){
     gcolor3 \
     gimp \
     git \
+    git-delta \
     gnome-keyring \
     google-opensans-fonts \
     gparted \
