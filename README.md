@@ -62,7 +62,7 @@ It's also secure.
 
 #### Install the base system
 Currently, the very first installation must be carried
-by an automatic installer, but every other reinstall
+by the distro's official installer, but every other reinstall
 of the same machine is automatic!
 
 So for your first install, you can just download
@@ -91,7 +91,7 @@ git checkout main
 git merge origin/main
 ```
 
-Now all the configuration is downloaded and tracked in your home
+Now, all the configuration is downloaded and tracked in your home
 folder. You can easily edit and commit back to your local branch.
 You can push to your backup server. You can reinstall from your
 backup server and reset to your last checkpoint easily!
@@ -102,7 +102,7 @@ Along with the configuration, a very important bash script
 was merged into your home and that is
 [~/bin/update](https://github.com/frantisekstanko/my-home/blob/main/bin/update).
 
-This script performs either an initial install on everything
+This script performs either an initial install of everything
 custom on top of the base system, or updates it at
 any point in time.
 
@@ -121,12 +121,12 @@ to be executed over and over again safely. This ensures 4 things:
 - the same procedure can be executed from any starting point of the system
 
 - if the script fails, there is no need to "rollback" to anywhere;
-simply see what has gone wrong, fix the problem somehow,
+simply see what has gone wrong, fix the problem,
 and execute the script again, without even needing to reboot
 
 - as this script is already tracked with `git`,  you can commit
 any fixes or changes and in a future reinstall, already start
-with those (or open a pull request and share with us!)
+with those fixes applied (or open a pull request and share with us!)
 
 - when you are on a deployed system and decide to add/install
 something, you do it once and for all; simply by adding it to the
@@ -138,10 +138,12 @@ How cool is that?
 
 After the install, your desktop environment is ready with:
 
-- [i3gaps](https://github.com/Airblader/i3) - a tiling window manager, which can be set to stacking
-with just one config parameter
-- [polybar](https://github.com/polybar/polybar) - a fast and easy-to-use tool for creating status bars
-- [kitty](https://github.com/kovidgoyal/kitty) - the fast, feature-rich, cross-platform, GPU based terminal
+- [i3gaps](https://github.com/Airblader/i3) - a tiling window manager,
+which can be set to stacking with just one config parameter
+- [polybar](https://github.com/polybar/polybar) - a fast and easy-to-use
+tool for creating status bars
+- [kitty](https://github.com/kovidgoyal/kitty) - the fast, feature-rich,
+cross-platform, GPU based terminal
 
 All your favorite software can be installed easily, for example:
 
@@ -155,7 +157,7 @@ All your favorite software can be installed easily, for example:
 ### How to track changes and edit everything to your liking
 
 In `~/.config/updater/profiles/`, a profile for this install
-was created. The profile contains 2 important files:
+is created. The profile contains 2 important files:
 
 - `.env` - the main configuration of this profile.
 You can edit this file whenever you want by executing
@@ -166,7 +168,7 @@ will be applied
 can be later used for unattended reinstall of this
 workstation
 
-Both files can, and should be, commited to your local repository,
+Both files can, and should be, commited to your local repository;
 for backup purposes, for example.
 
 #### If you don't like anything
@@ -178,19 +180,22 @@ Open issues. Tell me what you think!
 
 ## Cool default configuration
 
-Thanks to an amazing work by [Justin Buchanan](https://github.com/justbuchanan/i3scripts),
-we have a beautiful and ingenious task manager for i3. On this example, you can see
-3 workspaces with various apps running. The second workspace holds 3 instances of Firefox.
+Thanks to an amazing work by
+[Justin Buchanan](https://github.com/justbuchanan/i3scripts),
+we have a beautiful and ingenious task manager for i3. In this example,
+you can see 3 workspaces with various apps running.
+The second workspace holds 3 instances of Firefox.
 
 ![1666892801](https://user-images.githubusercontent.com/100702441/198362002-adc83818-5529-48ed-8b6f-76abdc841f30.png)
 
 The bar is [easily configurable](https://github.com/polybar/polybar/wiki).
 
-Here's a git status, cpu status, available RAM, volume, amount of CO2 in my room, battery and backlight:
+Here's a git status, cpu status, available RAM, volume,
+amount of CO2 in my room, battery and backlight:
 
 ![1666892380](https://user-images.githubusercontent.com/100702441/198362004-682f014b-cb5b-41fb-8f2a-3df01aeee1ec.png)
 
-White values are warnings. Red values are danger. The ranges can be configured.
+White values are notices. Red values are danger. The ranges can be configured.
 
 ### Things that work out of the box:
 
