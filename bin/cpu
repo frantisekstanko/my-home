@@ -46,10 +46,10 @@ while true; do
         showperc=${perc}
     fi
 
-    if [[ "${perc}" -ge 50 ]]; then
+    if [[ "${perc}" -ge 25 ]]; then
         showperc="%{F#ff6666}${showperc}%%{F-}"
         severity=2
-    elif [[ "${perc}" -ge 25 ]]; then
+    elif [[ "${perc}" -ge 10 ]]; then
         showperc="%{F#eee}${showperc}%%{F-}"
         severity=1
     else
