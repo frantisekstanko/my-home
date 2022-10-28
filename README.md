@@ -4,9 +4,6 @@ I will keep this project called "my home" for now. As in, `~/`.
 
 It can be your home too.
 
-A lot more information will be added to this
-README in the near future (hopefully).
-
 ![1666991586](https://user-images.githubusercontent.com/100702441/198734087-5f56398c-956f-41db-8b15-64a66f091924.png)
 
 ## About this project
