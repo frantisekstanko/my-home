@@ -7,7 +7,7 @@ It can be your home too.
 A lot more information will be added to this
 README in the near future (hopefully).
 
-![Screenshot](https://user-images.githubusercontent.com/100702441/198291280-8a2f9624-3ebb-4518-9f30-92d7de686360.png "Screenshot")
+![1666991586](https://user-images.githubusercontent.com/100702441/198734087-5f56398c-956f-41db-8b15-64a66f091924.png)
 
 ## About this project
 
