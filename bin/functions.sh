@@ -369,7 +369,7 @@ function get_preset_packages_list(){
   if [[ "${LOCALWEBDEV}" == true ]]; then
     install+=(apache2 php8 php8-cli mariadb apache2-mod_php8 php8-mysql \
       php8-calendar php8-mbstring php8-xdebug php8-gd php8-pcntl \
-      php-composer2)
+      php-composer2 php8-intl)
   fi
 
   if [[ "${TLP}" == true ]]; then
