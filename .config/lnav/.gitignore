@@ -1,0 +1,9 @@
+*.db
+*.history
+*.sample
+*.tmp
+crash*log
+formats/default
+latest-crash.log
+view-info*json
+
