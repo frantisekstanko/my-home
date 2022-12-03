@@ -15,3 +15,7 @@ PS1+="\[$(tput setaf 7)\]]"
 PS1+="\[$(tput setaf 7)\]\\$ "
 PS1+="\[$(tput sgr0)\]"
 
+if command -v tmux > /dev/null && [[ -n "${DISPLAY}" ]] && [[ -z "${TMUX}" ]]; then
+    tmux attach || tmux >/dev/null 2>&1
+fi
+
