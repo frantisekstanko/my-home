@@ -361,6 +361,8 @@ if [[ ! -f "${UPDATER_COMPLETED_AT_LEAST_ONCE_SAVE_FILE}" ]]; then
   date '+%s' > "${UPDATER_COMPLETED_AT_LEAST_ONCE_SAVE_FILE}"
 fi
 
+source "${UPDATER_DIR}/update.personal"
+
 echo_current_step 'All done'
 
 if [[ "${show_startx_hint}" == true ]]; then

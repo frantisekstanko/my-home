@@ -1,0 +1,18 @@
+#!/bin/bash
+
+## bash strict mode
+set -euo pipefail
+IFS=$'\n\t'
+
+if [[ "${EUID}" -eq 0 ]]; then
+    echo "Please, do NOT run me as root."
+    exit 1
+fi
+
+# shellcheck disable=SC2154
+if [[ "${INSTALLATION_MODE}" == 'full' ]]; then
+    echo 'Nothing to be done at the moment.'
+fi
+
+echo 'There is nothing else left to do.'
+
