@@ -471,10 +471,6 @@ function install_phpstorm(){
   cd ~/data/software/PhpStorm
   local_file=$(set -e; wget_or_get_from_cache "${1}" "${php_storm_url}")
   tar -xzf "${local_file}" -C ~/data/software/PhpStorm
-  {
-    echo 'fs.inotify.max_user_watches = 524288'
-    echo
-  } | sudo tee /usr/lib/sysctl.d/60-jetbrains.conf > /dev/null 2>&1
 }
 
 function install_spotify(){

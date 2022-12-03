@@ -288,6 +288,11 @@ if [[ "${INSTALLATION_MODE}" == 'full' ]]; then
     if [[ ! -d ~/data/software/PhpStorm/ ]]; then
       install_phpstorm "${UPDATER_CACHE_DIR}"
     fi
+
+    {
+      echo 'fs.inotify.max_user_watches = 524288'
+      echo
+    } | sudo tee /usr/lib/sysctl.d/60-jetbrains.conf > /dev/null 2>&1
   fi
 
   if [[ "${SPOTIFY}" == true ]]; then
