@@ -183,11 +183,6 @@ if [[ "${INSTALLATION_MODE}" == 'full' ]]; then
     --no-confirm \
     --auto-agree-with-licenses
 
-  if [[ ! -d ~/.oh-my-zsh ]]; then
-    echo_current_step 'Install oh-my-zsh'
-    git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
-  fi
-
   echo_current_step 'Initialize /tmp/ in tmpfs'
   if ! grep -q '^tmpfs /tmp/' /etc/fstab; then
     {
