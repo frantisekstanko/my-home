@@ -277,7 +277,6 @@ function get_base_packages_list(){
     compsize \
     deadbeef \
     dex \
-    diff-so-fancy \
     ecryptfs-utils \
     fd \
     feh \
