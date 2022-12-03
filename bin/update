@@ -45,6 +45,7 @@ done
 source "${UPDATER_DIR}/functions.sh"
 
 ## the following will ensure that the current hostname has a valid profile
+##
 ## hostnames serve as unique identifiers of specific workstations
 ##
 ## after this function successfully exits, we obtain two new variables
@@ -59,8 +60,8 @@ UPDATER_LOG_DIR="${UPDATER_PROFILES_DIR}/${HOSTNAME}/log"
 ## the following are 3 simple save files which contain the unixtime of when
 ## this script finished certain actions on this workstation for the first time
 ## 
-## this will help us know during future executions of this script
-## how much work we need to do
+## this will help us determine, during future executions of this script,
+## how much work needs to be done
 UPDATER_COMPLETED_AT_LEAST_ONCE_SAVE_FILE="${UPDATER_LOG_DIR}/second_stage_done"
 REPOS_INSTALLED_SAVE_FILE="${UPDATER_LOG_DIR}/repos_installed"
 SYSTEM_CLONED_SAVE_FILE="${UPDATER_LOG_DIR}/system_cloned"
@@ -263,7 +264,7 @@ if [[ "${INSTALLATION_MODE}" == 'full' ]]; then
     sudo usermod -s "${zshfile}" "${WHOAMI}" > /dev/null
   fi
 
-  # let us make sure all important files and directories correct chmod
+  # let us make sure all important files and directories have the correct chmod
   if [[ -d ~/.ssh ]]; then
     chmod 700 ~/.ssh
     chmod 600 ~/.ssh/* || true
