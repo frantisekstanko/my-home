@@ -1,1 +1,6 @@
-PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:$HOME/.npm-local/bin"
+PATH="$HOME/bin"
+PATH+=":$HOME/.local/bin"
+PATH+=":$HOME/.npm-local/bin"
+PATH+=":/usr/local/bin"
+PATH+=":/usr/bin"
+PATH+=":/bin"
