@@ -253,12 +253,6 @@ if [[ "${INSTALLATION_MODE}" == 'full' ]]; then
     fi
   done
 
-  # make zsh the default shell
-  zshfile=$(command -v zsh)
-  if [[ -n "${zshfile}" ]]; then
-    sudo usermod -s "${zshfile}" "${WHOAMI}" > /dev/null
-  fi
-
   # let us make sure all important files and directories have the correct chmod
   if [[ -d ~/.ssh ]]; then
     chmod 700 ~/.ssh
