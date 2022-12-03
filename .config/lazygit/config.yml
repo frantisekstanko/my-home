@@ -9,6 +9,9 @@ gui:
 
 promptToReturnFromSubprocess: false
 
+refresher:
+  refreshInterval: 1
+
 git:
   paging:
     colorArg: always
