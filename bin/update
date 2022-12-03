@@ -335,8 +335,6 @@ pip3 --quiet install --upgrade tldr i3ipc fontawesome
 
 ## TODO make this configurable
 install_lazygit "${UPDATER_CACHE_DIR}"
-install_phpstan "${UPDATER_CACHE_DIR}"
-install_php_cs_fixer "${UPDATER_CACHE_DIR}"
 
 if [[ "${INSTALL_SASS}" == true ]]; then
   install_dart_sass "${UPDATER_CACHE_DIR}"

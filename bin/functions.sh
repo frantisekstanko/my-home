@@ -511,44 +511,6 @@ function install_lazygit(){
   fi
 }
 
-function install_phpstan(){
-  whoami=$(whoami)
-  # shellcheck disable=SC2311
-  local_file=$(get_latest_release_from_github "${1}" \
-    'phpstan/phpstan' \
-    '.assets[] | select (.name == "phpstan.phar")' \
-    'stop_if_not_new')
-  if [[ -n "${local_file}" ]]; then
-    target_file="/home/${whoami}/.local/bin/phpstan"
-    if ! cmp --silent "${local_file}" "${target_file}"; then
-      if cp "${local_file}" "${target_file}"; then
-        chmod +x "${target_file}"
-      else
-        echo_error 'phpstan is in use. cannot update now.'
-      fi
-    fi
-  fi
-}
-
-function install_php_cs_fixer(){
-  whoami=$(whoami)
-  # shellcheck disable=SC2311
-  local_file=$(get_latest_release_from_github "${1}" \
-    'FriendsOfPHP/PHP-CS-Fixer' \
-    '.assets[] | select (.name == "php-cs-fixer.phar")' \
-    'stop_if_not_new')
-  if [[ -n "${local_file}" ]]; then
-    target_file="/home/${whoami}/.local/bin/php-cs-fixer"
-    if ! cmp --silent "${local_file}" "${target_file}"; then
-      if cp "${local_file}" "${target_file}"; then
-        chmod +x "${target_file}"
-      else
-        echo_error 'php-cs-fixer is in use. cannot update now.'
-      fi
-    fi
-  fi
-}
-
 function install_dart_sass(){
   whoami=$(whoami)
   sass_target="/home/${whoami}/.local/bin/sass"
