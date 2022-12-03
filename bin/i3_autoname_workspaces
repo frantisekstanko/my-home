@@ -206,6 +206,7 @@ WINDOW_ICONS = {
     'subl3': fa.icons['file-alt'],
     'sublime_text': fa.icons['file-alt'],
     'sublime_merge': fa.icons['git'],
+    'lazygit': fa.icons['git'],
     'thunar': fa.icons['copy'],
     'thunderbird': fa.icons['envelope'],
     'totem': fa.icons['play'],
