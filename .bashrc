@@ -19,3 +19,4 @@ if command -v tmux > /dev/null && [[ -n "${DISPLAY}" ]] && [[ -z "${TMUX}" ]]; t
     tmux attach || tmux >/dev/null 2>&1
 fi
 
+alias x='startx'
