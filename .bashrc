@@ -1,4 +1,5 @@
 PATH="$HOME/bin"
+PATH+=":$HOME/.config/composer/vendor/bin"
 PATH+=":$HOME/.local/bin"
 PATH+=":$HOME/.npm-local/bin"
 PATH+=":/usr/local/bin"
