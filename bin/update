@@ -31,11 +31,15 @@ fi
 
 ## let the user edit this script before anything else continues
 for var in "$@"; do
-  if [[ "${var}" == "--edit" ]]; then
+  if [[ "${var}" == "--edit" || "${var}" == "-e" ]]; then
       ${EDITOR} "${UPDATER}"
       exit
   fi
-  if [[ "${var}" == "--fn" ]]; then
+  if [[ "${var}" == "--personal" || "${var}" == "-p" ]]; then
+      ${EDITOR} "${UPDATER}.personal"
+      exit
+  fi
+  if [[ "${var}" == "--fn" || "${var}" == "-f" ]]; then
     ${EDITOR} "${UPDATER_DIR}/functions.sh"
     exit
   fi
