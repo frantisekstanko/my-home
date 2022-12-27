@@ -356,6 +356,9 @@ fi
 
 source "${UPDATER_DIR}/update.personal"
 
+gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark
+gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+
 echo_current_step 'All done'
 
 if [[ "${show_startx_hint}" == true ]]; then
