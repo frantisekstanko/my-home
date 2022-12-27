@@ -252,10 +252,10 @@ function echo_error(){
 function clone_system(){
     whoami=$(whoami)
     datetime=$(date '+%Y-%m-%d_%H:%M:%S')
-    local autoinstfile="${1}/${datetime}-clean.install.xml" 
+    local autoinstfile="${1}/${datetime}-clean.install.xml"
     sudo zypper install --no-confirm autoyast2
     sudo yast2 clone_system
-    sudo mv /root/autoinst.xml "${autoinstfile}" 
+    sudo mv /root/autoinst.xml "${autoinstfile}"
     sudo chown "${whoami}:${whoami}" "${autoinstfile}"
     sudo chmod 644 "${autoinstfile}"
 }
