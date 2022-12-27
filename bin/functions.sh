@@ -284,6 +284,7 @@ function get_base_packages_list(){
     fontawesome-fonts \
     fzf \
     fzf-zsh-completion \
+    gcc-c++ \
     gcolor3 \
     gimp \
     git \
@@ -304,6 +305,7 @@ function get_base_packages_list(){
     libQt5QuickControls2-5 \
     libnotify-tools \
     libqt5-qtquickcontrols2 \
+    libstdc++-devel \
     lnav \
     lua54 \
     meld \
@@ -332,6 +334,7 @@ function get_base_packages_list(){
     sshfs \
     stress-ng \
     tigervnc \
+    tree-sitter \
     ubuntu-fonts \
     unzip \
     x11vnc \
