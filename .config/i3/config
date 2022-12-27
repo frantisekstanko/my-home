@@ -157,18 +157,18 @@ bar {
 smart_gaps off
 smart_borders no_gaps
 default_border pixel 0
-gaps inner 6
+gaps inner 8
 focus_follows_mouse no
 mouse_warping none
 
-for_window [class=".*"] border pixel 1
+for_window [class=".*"] border pixel 2
 
-set $windowBorder #111111
-set $activeBorder #00595a
+set $windowBorder #333333
+set $activeBorder #777777
 
 # class                 border   backgr.  text    indicator       child_border
 client.focused          $activeBorder  #000000  #eeeeee $windowBorder   $activeBorder
-client.unfocused        #000000        #1d2021  #7c6f64 $windowBorder   #000000
+client.unfocused        #000000        #1d2021  #7c6f64 $windowBorder   $windowBorder
 client.focused_inactive #000000        #1d2021  #7c6f64 $windowBorder   #000000
 client.urgent           #000000        #1d2021  #7c6f64 $windowBorder   #000000
 
