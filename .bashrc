@@ -17,8 +17,12 @@ if [[ -n "${TERM}" && "${TERM}" != 'dumb' ]]; then
     PS1+="\[$(tput setaf 7)\]\\$ "
     PS1+="\[$(tput sgr0)\]"
 
-if command -v tmux > /dev/null && [[ -n "${DISPLAY}" ]] && [[ -z "${TMUX}" ]]; then
-    tmux attach || tmux >/dev/null 2>&1
+    if command -v tmux > /dev/null \
+        && [[ -n "${DISPLAY}" || -n "${SSH_CLIENT}" ]] \
+        && [[ -z "${TMUX}" ]]
+    then
+        tmux attach || tmux && exit
+    fi
 fi
 
 fi
