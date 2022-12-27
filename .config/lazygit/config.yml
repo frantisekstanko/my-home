@@ -6,6 +6,10 @@ gui:
     inactiveBorderColor:
       - '#666'
   showFileTree: false
+  commandLogSize: 8
+  sidePanelWidth: 0.25
+  merging:
+    args: "--no-ff"
 
 promptToReturnFromSubprocess: false
 
