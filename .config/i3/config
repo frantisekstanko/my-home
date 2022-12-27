@@ -1,7 +1,7 @@
 set $mod Mod1
-bindsym $mod+c exec --no-startup-id ~/bin/kblayout
+bindsym $mod+c exec --no-startup-id ~/bin/kblayout && exec pkill -SIGRTMIN+12 i3blocks
 
-exec_always --no-startup-id polybar_run
+font pango:MxPlus IBM VGA 9x16, FontAwesome 16px
 exec_always --no-startup-id ~/bin/i3_autoname_workspaces \
   --norenumber_workspaces --icon_list_format mathematician
 exec_always --no-startup-id feh --bg-fill --no-fehbg \
@@ -18,31 +18,37 @@ set $ws8 "8"
 set $ws9 "9"
 
 bindsym XF86AudioRaiseVolume exec --no-startup-id \
-  amixer -q -D pulse sset Master 1%+
+amixer -q -D pulse sset Master 1%+ && exec pkill -SIGRTMIN+10 i3blocks
 
 bindsym XF86AudioLowerVolume exec --no-startup-id \
-  amixer -q -D pulse sset Master 1%-
+amixer -q -D pulse sset Master 1%- && exec pkill -SIGRTMIN+10 i3blocks
 
 bindsym XF86AudioMute exec --no-startup-id \
-  pactl set-sink-mute @DEFAULT_SINK@ toggle
+pactl set-sink-mute @DEFAULT_SINK@ toggle && exec pkill -SIGRTMIN+10 i3blocks
 
 bindsym XF86AudioMicMute exec --no-startup-id \
-  pactl set-source-mute @DEFAULT_SOURCE@ toggle
+pactl set-source-mute @DEFAULT_SOURCE@ toggle && exec pkill -SIGRTMIN+10 i3blocks
 
 bindsym XF86AudioPlay exec playerctl play-pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
-bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set 1%+
-bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 1%-
-bindsym XF86LaunchB exec --no-startup-id brightnessctl set 10%+
-bindsym XF86LaunchA exec --no-startup-id brightnessctl set 10%-
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set 1%+ \
+  && exec pkill -SIGRTMIN+11 i3blocks
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 1%- \
+  && exec pkill -SIGRTMIN+11 i3blocks
+bindsym XF86LaunchB exec --no-startup-id brightnessctl set 10%+ \
+  && exec pkill -SIGRTMIN+11 i3blocks
+bindsym XF86LaunchA exec --no-startup-id brightnessctl set 10%- \
+  && exec pkill -SIGRTMIN+11 i3blocks
 bindsym XF86KbdBrightnessUp exec --no-startup-id \
   brightnessctl -d *kbd_backlight set 1%+
 bindsym XF86KbdBrightnessDown exec --no-startup-id \
   brightnessctl -d *kbd_backlight set 1%-
 
-bindsym $mod+bracketleft  exec --no-startup-id brightnessctl set 2%-
-bindsym $mod+bracketright exec --no-startup-id brightnessctl set 2%+
+bindsym $mod+bracketleft  exec --no-startup-id brightnessctl set 2%- \
+  && exec pkill -SIGRTMIN+11 i3blocks
+bindsym $mod+bracketright exec --no-startup-id brightnessctl set 2%+ \
+  && exec pkill -SIGRTMIN+11 i3blocks
 
 floating_modifier $mod
 bindsym $mod+Return exec kitty
@@ -70,8 +76,10 @@ bindsym $mod+o exec i3lock -c 000000 -e
 bindsym $mod+Ctrl+j move workspace to output left
 bindsym $mod+Ctrl+l move workspace to output right
 bindsym $mod+p exec screenshot
-bindsym $mod+x exec --no-startup-id ~/bin/redshift_switch blue
-bindsym $mod+z exec --no-startup-id ~/bin/redshift_switch yellow
+bindsym $mod+x exec --no-startup-id ~/bin/redshift_switch blue \
+  && exec pkill -SIGRTMIN+14 i3blocks
+bindsym $mod+z exec --no-startup-id ~/bin/redshift_switch yellow \
+  && exec pkill -SIGRTMIN+14 i3blocks
 
 workspace $ws1 output primary
 workspace $ws2 output primary
@@ -121,6 +129,29 @@ mode "resize" {
     bindsym Return mode "default"
     bindsym Escape mode "default"
     bindsym $mod+r mode "default"
+}
+
+set $barbg #181B1B
+
+bar {
+    status_command i3blocks
+    i3bar_command i3bar
+    position top
+    colors {
+        background $barbg
+        statusline #777777
+        separator #252525
+        focused_workspace  #282828   #282828   #fbf1c7
+        active_workspace   #1d2021   #1d2021   #ebdbb2
+        inactive_workspace $barbg    $barbg    #7c6f64
+        urgent_workspace   #ff6666   #ff6666   #000000
+        binding_mode       #cc241d   #cc241d   #fbf1c7
+    }
+    tray_output primary
+    tray_padding 8
+    height 32
+    workspace_min_width 60
+    strip_workspace_numbers yes
 }
 
 smart_gaps off

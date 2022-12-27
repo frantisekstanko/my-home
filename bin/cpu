@@ -24,61 +24,28 @@ if [[ -z "${temperature_file}" ]]; then
     exit 1
 fi
 
-while true; do
-    load=$(awk '{ print $1 }' < /proc/loadavg)
-    float=$(echo "scale=2 ; ${load} / ${cores} * 100" | bc)
-    perc=$(printf "%.f" "${float}")
 
-    temp=$(cat "${temperature_file}")
+load=$(awk '{ print $1 }' < /proc/loadavg)
+float=$(echo "scale=2 ; ${load} / ( ${cores} / 2 ) * 100" | bc)
+perc=$(printf "%.f" "${float}")
 
-    temp=$(echo "${temp} / 1000" | bc)
-    cel=$'\xc2\xb0'
+temp=$(cat "${temperature_file}")
 
-    date_now=$(date +%s)
+temp=$(echo "${temp} / 1000" | bc)
+cel=$'\xc2\xb0'
 
-    echo -e "${date_now}\t${perc}\t${temp}" >> "${log_file}"
+date_now=$(date +%s)
 
-    if [[ "${perc}" -gt 99 ]]; then
-        showperc=99
-    elif [[ "${perc}" -lt 10 ]]; then
-        showperc=" ${perc}"
-    else
-        showperc=${perc}
-    fi
+echo -e "${date_now}\t${perc}\t${temp}" >> "${log_file}"
 
-    if [[ "${perc}" -ge 25 ]]; then
-        showperc="%{F#ff6666}${showperc}%%{F-}"
-        severity=2
-    elif [[ "${perc}" -ge 10 ]]; then
-        showperc="%{F#eee}${showperc}%%{F-}"
-        severity=1
-    else
-        showperc="${showperc}%"
-        severity=0
-    fi
+echo "  CPU ${perc}% ${temp}${cel}  "
+echo "${temp}"
 
-    if [[ "${temp}" -ge 70 ]]; then
-        showtemp="%{F#ff6666}${temp}${cel}%{F-}"
-        severity=2
-    elif [[ "${temp}" -ge 60 ]]; then
-        showtemp="%{F#eee}${temp}${cel}%{F-}"
-        if [[ "${severity}" -lt 1 ]]; then
-            severity=1
-        fi
-    else
-        showtemp="${temp}${cel}"
-    fi
-
-    if [[ "${severity}" -ge 2 ]]; then
-        icon="%{F#ff6666}%{F-}"
-    elif [[ "${severity}" -ge 1 ]]; then
-        icon="%{F#eee}%{F-}"
-    else
-        icon=""
-    fi
-
-    echo "${icon} ${showperc} ${showtemp}"
-
-    sleep 1
-done
+if [[ "$temp" -gt 80 || "$perc" -ge 75 ]]; then
+    exit 33
+elif [[ "$temp" -gt 70 || "$perc" -ge 50 ]]; then
+    echo "#ff6666"
+elif [[ "$temp" -gt 60 || "$perc" -ge 25 ]]; then
+    echo "#eeeeee"
+fi
 

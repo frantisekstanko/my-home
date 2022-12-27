@@ -5,7 +5,23 @@ IFS=$'\n\t'
 
 layout=$(setxkbmap -query | grep 'layout' | awk '{print $2}')
 
-if [[ ${layout} == "us" ]]; then
+icon=''
+
+# for i3blocks
+if [[ "$#" -gt 0 ]]; then
+    if [[ "$1" == "get" ]]; then
+        if [[ "$layout" == "nl" ]]; then
+            echo "   ${icon} nl  "
+            exit 33
+        else
+            exit 0
+        fi
+        exit
+    fi
+fi
+
+# for i3 bindsym
+if [[ $layout == "us" ]]; then
     setxkbmap "nl"
 else
     setxkbmap "us"

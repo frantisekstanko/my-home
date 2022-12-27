@@ -11,47 +11,54 @@ mkdir -p ~/.stats
 
 log_file=~/.stats/battery.log
 
-while true; do
-    capacity=$(cat /sys/class/power_supply/BAT0/capacity)
-    status=$(cat /sys/class/power_supply/BAT0/status)
+capacity=$(cat /sys/class/power_supply/BAT0/capacity)
+status=$(cat /sys/class/power_supply/BAT0/status)
 
-    datenow=$(date +%s)
-    echo -e "${datenow}\t${capacity}" >> "${log_file}"
+datenow=$(date +%s)
+echo -e "${datenow}\t${capacity}" >> "${log_file}"
 
-    if [[ "${capacity}" -gt 100 ]]; then
-        capacity=100
-    fi
+color=''
+bg=''
 
-    if [[ "${capacity}" -gt 90 ]]; then
-        icon=''
-    elif [[ "${capacity}" -gt 70 ]]; then
-        icon=''
-    elif [[ "${capacity}" -gt 50 ]]; then
-        icon=''
-    elif [[ "${capacity}" -gt 10 ]]; then
-        icon=''
+if [[ "${capacity}" -gt 100 ]]; then
+    capacity=100
+fi
+
+if [[ "${capacity}" -gt 90 ]]; then
+    icon=''
+elif [[ "${capacity}" -gt 70 ]]; then
+    icon=''
+elif [[ "${capacity}" -gt 50 ]]; then
+    icon=''
+elif [[ "${capacity}" -gt 10 ]]; then
+    icon=''
+    color='#fb4934'
+else
+    icon=''
+    color="#fbf1c7"
+    bg="#cc241d"
+fi
+
+color=''
+
+if [[ "${status}" == 'Discharging' ]]; then
+    if [[ "${capacity}" -gt 50 ]]; then
+        color='#ffffff'
     else
-        icon=''
+        color='#ff6666'
     fi
+elif [[ "${status}" == 'Charging' ]]; then
+    color='#689d6a'
+fi
 
-    color=''
+echo "  BAT ${capacity}%  ";
+echo "${capacity}%"
 
-    if [[ "${status}" == 'Discharging' ]]; then
-        if [[ "${capacity}" -gt 50 ]]; then
-            color='#ffffff'
-        else
-            color='#ff6666'
-        fi
-    elif [[ "${status}" == 'Charging' ]]; then
-        color='#689d6a'
-    fi
+if [[ -n "$color" ]]; then
+    echo "${color}"
+fi
 
-    if [[ -n "${color}" ]]; then
-        echo "%{F${color}}${icon} ${capacity}%%{F-}";
-    else
-        echo "${icon} ${capacity}%";
-    fi
-
-    sleep 1
-done
+if [[ -n "$bg" ]]; then
+    echo "${bg}"
+fi
 

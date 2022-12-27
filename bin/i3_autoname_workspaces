@@ -2,8 +2,9 @@
 #
 # github.com/justbuchanan/i3scripts
 #
-# This script listens for i3 events and updates workspace names to show icons
-# for running programs.  It contains icons for a few programs, but more can
+# This script listens for i3 events and updates workspace names
+# to show icons for running programs.
+# It contains icons for a few programs, but more can
 # easily be added by editing the WINDOW_ICONS list below.
 #
 # It also re-numbers workspaces in ascending order with one skipped number
@@ -16,9 +17,7 @@
 # * fontawesome - install with pip
 #
 # Installation:
-# * Download this repo and place it in ~/.config/i3/ (or anywhere you want)
-# * Add "exec_always ~/.config/i3/i3scripts/autoname_workspaces.py &" to your i3 config
-# * Restart i3: $ i3-msg restart
+# Look how this file is being used at ~./config/i3/config
 #
 # Configuration:
 # The default i3 config's keybindings reference workspaces by name, which is an
@@ -61,17 +60,15 @@ def parse_workspace_name(name):
 # Given a NameParts object, returns the formatted name
 # by concatenating them together.
 def construct_workspace_name(parts):
-    new_name = str(parts.num)
+    new_name = str(parts.num)+' '+str(parts.num)+' '
     if parts.shortname or parts.icons:
-        new_name += ' '
-
         if parts.shortname:
             new_name += parts.shortname
 
         if parts.icons:
-            new_name += '' + parts.icons + ' '
+            new_name += parts.icons
 
-    return new_name
+    return new_name+' '
 
 
 # Return an array of values for the X property on the given window.
@@ -82,7 +79,7 @@ def xprop(win_id, property):
             ['xprop', '-id', str(win_id), property], stderr=proc.DEVNULL)
         prop = prop.decode('utf-8')
         return re.findall('"([^"]*)"', prop)
-    except proc.CalledProcessError as e:
+    except proc.CalledProcessError:
         logging.warn("Unable to get property for window '%d'" % win_id)
         return None
 
@@ -109,7 +106,7 @@ def _encode_base_10_number(n: int, symbols: str) -> str:
 def format_icon_list(icon_list, icon_list_format='default'):
     if icon_list_format.lower() == 'default':
         # Default (no formatting)
-        return ' '.join(icon_list)
+        return ' | '.join(icon_list)
 
     elif icon_list_format.lower() == 'mathematician':
         # Mathematician mode
@@ -133,7 +130,7 @@ def format_icon_list(icon_list, icon_list_format='default'):
                                 _encode_base_10_number(count, _subscript))
             else:
                 new_list.append(icon)
-        return ' '.join(new_list)
+        return ' | '.join(new_list)
 
     else:
         raise ValueError("Unknown format name for the list of icons: ",
@@ -218,6 +215,19 @@ WINDOW_ICONS = {
     'zoom': fa.icons['comment'],
 }
 
+WINDOW_TEXTS = {
+    'firefox': 'firefox',
+    'google-chrome': 'chrome',
+    'jetbrains-phpstorm': 'phpstorm',
+    'kitty': 'terminal',
+    'lazygit': 'git',
+    'meld': 'meld',
+    'mpv': 'mpv',
+    'signal': 'signal',
+    'spotify': 'spotify',
+    'sublime_merge': 'git',
+}
+
 # This icon is used for any application not in the list above
 DEFAULT_ICON = '*'
 
@@ -225,6 +235,7 @@ DEFAULT_ICON = '*'
 # re-numbered in ascending order with a "gap" left on each monitor. This is
 # overridden via command-line flag.
 RENUMBER_WORKSPACES = True
+WINDOWS_AS_ICONS = True
 
 
 def ensure_window_icons_lowercase():
@@ -235,14 +246,27 @@ def ensure_window_icons_lowercase():
 def icon_for_window(window):
     # Try all window classes and use the first one we have an icon for
     classes = xprop(window.window, 'WM_CLASS')
-    if classes != None and len(classes) > 0:
+    if classes is not None and len(classes) > 0:
         for cls in classes:
             cls = cls.lower()  # case-insensitive matching
-            if cls in WINDOW_ICONS:
-                return WINDOW_ICONS[cls] + ' '
-    logging.info('No icon available for window with classes: %s' %
-                 str(classes))
-    return DEFAULT_ICON
+            if WINDOWS_AS_ICONS is False:
+                if cls in WINDOW_TEXTS:
+                    return WINDOW_TEXTS[cls]
+
+                logging.info('No text available for window with classes: %s' %
+                             str(classes))
+
+            else:
+                if cls in WINDOW_ICONS:
+                    return WINDOW_ICONS[cls] + ' '
+
+                logging.info('No icon available for window with classes: %s' %
+                             str(classes))
+
+    if WINDOWS_AS_ICONS is True:
+        return DEFAULT_ICON
+    else:
+        return str(classes)
 
 
 # renames all workspaces based on the windows present
@@ -259,9 +283,10 @@ def rename_workspaces(i3, icon_list_format='default'):
         icon_list = [icon_for_window(w) for w in workspace.leaves()]
         new_icons = format_icon_list(icon_list, icon_list_format)
 
-        # As we enumerate, leave one gap in workspace numbers between each monitor.
+        # As we enumerate, leave one gap in workspace numbers
+        # between each monitor.
         # This leaves a space to insert a new one later.
-        if ws_info.output != prev_output and prev_output != None:
+        if ws_info.output != prev_output and prev_output is not None:
             n += 1
         prev_output = ws_info.output
 
@@ -276,8 +301,10 @@ def rename_workspaces(i3, icon_list_format='default'):
         if workspace.name == new_name:
             continue
 
-        logging.info('rename workspace "%s" to "%s"' %(workspace.name, new_name))
-        i3.command('rename workspace "%s" to "%s"' %(workspace.name, new_name))
+        logging.info('rename workspace "%s" to "%s"' %
+                     (workspace.name, new_name))
+        i3.command('rename workspace "%s" to "%s"' %
+                   (workspace.name, new_name))
 
 
 # Rename workspaces to just numbers and shortnames, removing the icons.
@@ -298,14 +325,18 @@ def on_exit(i3):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description=
-        "Rename workspaces dynamically to show icons for running programs.")
+        description="Rename workspaces dynamically to show icons for running programs.")
     parser.add_argument(
         '--norenumber_workspaces',
         action='store_true',
         default=False,
-        help=
-        "Disable automatic workspace re-numbering. By default, workspaces are automatically re-numbered in ascending order."
+        help="Disable automatic workspace re-numbering. By default, workspaces are automatically re-numbered in ascending order."
+    )
+    parser.add_argument(
+        '--windows_as_text',
+        action='store_true',
+        default=False,
+        help="Show windows as text."
     )
     parser.add_argument(
         '--icon_list_format',
@@ -319,6 +350,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     RENUMBER_WORKSPACES = not args.norenumber_workspaces
+    WINDOWS_AS_ICONS = not args.windows_as_text
 
     logging.basicConfig(level=logging.INFO)
 

@@ -321,7 +321,6 @@ function get_base_packages_list(){
     picom \
     pinentry-gnome3 \
     playerctl \
-    polybar \
     pulseaudio \
     pv \
     python3-pip \
